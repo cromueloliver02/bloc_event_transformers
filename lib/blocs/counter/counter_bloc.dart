@@ -8,12 +8,17 @@ part 'counter_state.dart';
 
 class CounterBloc extends Bloc<CounterEvent, CounterState> {
   CounterBloc() : super(CounterState.initial()) {
-    on<IncrementCounterEvent>(_incrementCounter);
-    on<DecrementCounterEvent>(
-      _decrementCounter,
-      // transformer: concurrent(), // default
-      // transformer: droppable(),
-      transformer: restartable(),
+    // on<IncrementCounterEvent>(_incrementCounter);
+    // on<DecrementCounterEvent>(
+    //   _decrementCounter,
+    //   // transformer: concurrent(), // default
+    //   // transformer: droppable(),
+    //   transformer: restartable(),
+    // );
+
+    on<CounterEvent>(
+      _sequentialIncrementOrDecrementCounter,
+      transformer: sequential(),
     );
   }
 
@@ -31,5 +36,14 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
   ) async {
     await Future.delayed(const Duration(seconds: 2));
     emit(state.copyWith(counter: state.counter - 1));
+  }
+
+  Future<void> _sequentialIncrementOrDecrementCounter(
+    CounterEvent event,
+    Emitter<CounterState> emit,
+  ) async {
+    if (event is IncrementCounterEvent) await _incrementCounter(event, emit);
+
+    if (event is DecrementCounterEvent) await _decrementCounter(event, emit);
   }
 }
