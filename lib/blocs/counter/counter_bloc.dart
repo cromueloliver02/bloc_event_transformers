@@ -11,7 +11,8 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
     on<IncrementCounterEvent>(_incrementCounter);
     on<DecrementCounterEvent>(
       _decrementCounter,
-      transformer: concurrent(), // default
+      // transformer: concurrent(), // default
+      transformer: droppable(),
     );
   }
 
